@@ -10,7 +10,8 @@ var EventEmitter = require('events').EventEmitter,
 	querystring = require('querystring'),
 	serializer = require('serializer'),
 	_ = require('underscore'),
-	CONTENT_TYPE_JSON = {'Content-type': 'application/json'};
+	CONTENT_TYPE_JSON = {'Content-type': 'application/json'},
+	REFRESH_TOKEN_EXTRA = 'refresh';
 
 function parse_authorization(authorization) {
 	if(!authorization){
@@ -59,7 +60,7 @@ OAuth2Provider.prototype.generateAccessToken = function(user_id, client_id, extr
 	token_options = token_options || {}
 	var out = _.extend(token_options, {
 		access_token: this.serializer.stringify([user_id, client_id, +new Date, extra_data]),
-		refresh_token: null,
+		refresh_token: this.serializer.stringify([user_id, client_id, +new Date, REFRESH_TOKEN_EXTRA]),
 	});
 	return out;
 };
@@ -222,6 +223,52 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 			this._createAccessToken(user_id, client_id, function(atok){
 				res.end(JSON.stringify(atok));
 			});
+		}, this));
+	}else if('refresh_token' === req.body.grant_type){
+		if(this.listeners('refresh_token_auth').length === 0) {
+			res.writeHead(401);
+			return res.end('refresh_token not supported');
+		}
+		var rt_user_id;
+		try {
+			var data = this.serializer.parse(req.body.refresh_token),
+				rt_user_id = data[0],
+				rt_client_id = data[1],
+				//rt_grant_date = new Date(data[2]),
+				rt_extra_data = data[3];
+			if(rt_client_id !== client_id || rt_extra_data !== REFRESH_TOKEN_EXTRA){
+				console.warn('client id or extra does not match');
+				res.writeHead(400);	
+				return res.end('invail refresh token');
+			}
+		}catch(e){
+			res.writeHead(400);
+			return res.end(e.message);
+		}		
+		this.emit('refresh_token_auth', client_id, client_secret, req.body.refresh_token, _.bind(function(err, user_id) {
+			if(err) {
+				res.writeHead(401);
+				return res.end(err.message);
+			}
+
+			if(user_id != rt_user_id){
+				console.log(user_id);
+				console.warn('refresh token user id does not match');
+				res.writeHead(400);	
+				return res.end('invaid refresh token');
+			}
+
+			this.emit('remove_refresh_token', client_id, req.body.refresh_token, _.bind(function(err){
+				if(err){
+					res.writeHead(500);	
+					return res.end('fail to refresh token');
+				}
+				res.writeHead(200, CONTENT_TYPE_JSON);
+
+				this._createAccessToken(user_id, client_id, function(atok){
+					res.end(JSON.stringify(atok));
+				});
+			}, this));
 		}, this));
 	}else{
 		this.emit('lookup_grant', client_id, client_secret, code, _.bind(function(err, user_id){
