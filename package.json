@@ -1,12 +1,18 @@
 {
   "name": "oauth2-provider",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "description": "A simple customizable OAuth 2.0 provider (server) for node.js.",
-  "homepage": "https://github.com/ammmir/node-oauth2-provider",
-  "author": {
-    "name": "Amir Malik",
-    "url": "http://amirmalik.net/"
-  },
+  "homepage": "https://github.com/finebraincom/node-oauth2-provider",
+  "contributors" : [
+    {
+      "name": "Amir Malik",
+      "url": "http://amirmalik.net/"
+    },
+    {
+      "name": "Iurii Kyian",
+      "email": "iurii.kyian@insights.md"
+    },
+  ],
   "main": "index",
   "dependencies": {
     "serializer": ">=0.0.2 <0.1.0",
