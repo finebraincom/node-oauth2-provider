@@ -49,6 +49,7 @@ function OAuth2Provider(options){
 
 	options['authorize_uri'] = options['authorize_uri'] || '/oauth/authorize';
 	options['access_token_uri'] = options['access_token_uri'] || '/oauth/access_token';
+	options['revoke_uri'] = options['revoke_uri'] || '/oauth/revoke';
 
 	this.options = options;
 	this.serializer = serializer.createSecureSerializer(this.options.crypt_key, this.options.sign_key);
@@ -258,7 +259,7 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				return res.end('invaid refresh token');
 			}
 
-			this.emit('remove_refresh_token', client_id, req.body.refresh_token, _.bind(function(err){
+			this.emit('remove_token', client_id, req.body.refresh_token, 'refresh_token', _.bind(function(err){
 				if(err){
 					res.writeHead(500);	
 					return res.end('fail to refresh token');
@@ -288,6 +289,37 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 	}
 };
 
+OAuth2Provider.prototype._processRevokeTokenUriPost = function(req, res){
+	var token = req.body.token,
+		tokenType = req.body.token_type_hint || 'access_token',
+		user_id, user_id, client_id;
+	if(!token){
+		res.writeHead(400);
+		return res.end('token required');
+	}
+	try {
+		var data = this.serializer.parse(token), extra_data;
+		user_id = data[0];
+		client_id = data[1];
+		//rt_grant_date = new Date(data[2]);
+		extra_data = data[3];
+		if(extra_data === REFRESH_TOKEN_EXTRA){
+			tokenType = 'refresh_token';
+		}
+	}catch(e){
+		res.writeHead(400);
+		return res.end(e.message);
+	}		
+	this.emit('remove_token', client_id, token, tokenType, function(err){
+		if(err){
+			res.writeHead(400);
+			return res.end(err.message);
+		}
+		res.writeHead(200, CONTENT_TYPE_JSON);
+		res.end(JSON.stringify({success : true}));
+	});
+};
+
 OAuth2Provider.prototype.oauth = function() {
 
 	return _.bind(function(req, res, next) {
@@ -300,6 +332,8 @@ OAuth2Provider.prototype.oauth = function() {
 			this._processAuthrizeUriPost(req, res);
 		}else if(req.method === 'POST' && this.options.access_token_uri === uri){
 			this._processAccessTokenUriPost(req, res);
+		}else if(req.method === 'POST' && this.options.revoke_uri === uri){
+			this._processRevokeTokenUriPost(req, res);
 		}else{
 			return next();
 		}
