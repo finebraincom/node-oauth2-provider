@@ -232,8 +232,9 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 			return res.end('refresh_token not supported');
 		}
 		var rt_user_id;
+		var refresh_token = req.body.refresh_token;
 		try {
-			var data = this.serializer.parse(req.body.refresh_token),
+			var data = this.serializer.parse(refresh_token),
 				rt_user_id = data[0],
 				rt_client_id = data[1],
 				//rt_grant_date = new Date(data[2]),
@@ -244,10 +245,24 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				return res.end('invail refresh token');
 			}
 		}catch(e){
-			res.writeHead(400);
-			return res.end(e.message);
+			try {
+				refresh_token = decodeURIComponent(refresh_token);
+				var data = this.serializer.parse(refresh_token),
+					rt_user_id = data[0],
+					rt_client_id = data[1],
+					//rt_grant_date = new Date(data[2]),
+					rt_extra_data = data[3];
+				if(rt_client_id !== client_id || rt_extra_data !== REFRESH_TOKEN_EXTRA){
+					console.warn('client id or extra does not match');
+					res.writeHead(400);	
+					return res.end('invail refresh token');
+				}
+			}catch(e){
+				res.writeHead(400);
+				return res.end(e.message);
+			}		
 		}		
-		this.emit('refresh_token_auth', client_id, client_secret, req.body.refresh_token, _.bind(function(err, user_id) {
+		this.emit('refresh_token_auth', client_id, client_secret, refresh_token, _.bind(function(err, user_id) {
 			if(err) {
 				res.writeHead(401);
 				return res.end(err.message);
