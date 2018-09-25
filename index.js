@@ -239,8 +239,8 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				rt_client_id = data[1],
 				//rt_grant_date = new Date(data[2]),
 				rt_extra_data = data[3];
-			if(rt_client_id !== client_id || rt_extra_data !== REFRESH_TOKEN_EXTRA){
-				console.warn('client id or extra does not match');
+			if (rt_extra_data !== REFRESH_TOKEN_EXTRA){
+				console.warn('extra does not match');
 				res.writeHead(400);	
 				return res.end('invail refresh token');
 			}
