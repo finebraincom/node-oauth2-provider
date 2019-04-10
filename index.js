@@ -258,13 +258,8 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 					return res.end('invail refresh token');
 				}
 			}catch(e){
-				res.set('Content-Type', 'application/json');
 				res.writeHead(400);
-				var error = {
-						error: e.message
-				};
-				
-				return res.end(JSON.stringify(error));
+				return res.end(e.message);
 			}		
 		}		
 		this.emit('refresh_token_auth', client_id, client_secret, refresh_token, _.bind(function(err, user_id) {
