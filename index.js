@@ -268,11 +268,11 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				return res.end(err.message);
 			}
 
-			if(user_id != rt_user_id){
+			if(user._id.toString() != rt_user_id){
 				console.log(user_id);
 				console.warn('refresh token user id does not match');
 				res.writeHead(400);	
-				return res.end('invaid refresh token');
+				return res.end('invalid refresh token');
 			}
 
 			this.emit('remove_token', client_id, req.body.refresh_token, 'refresh_token', _.bind(function(err){
@@ -282,7 +282,7 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				}
 				res.writeHead(200, CONTENT_TYPE_JSON);
 
-				this._createAccessToken(user_id, client_id, function(atok){
+				this._createAccessToken(user, client_id, function(atok){
 					res.end(JSON.stringify(atok));
 				});
 			}, this));
