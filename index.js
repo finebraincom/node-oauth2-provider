@@ -356,9 +356,9 @@ OAuth2Provider.prototype.oauth = function() {
 	}, this);
 };
 
-OAuth2Provider.prototype._createAccessToken = function(user_id, client_id, cb) {
-	this.emit('create_access_token', user_id, client_id, _.bind(function(extra_data, token_options) {
-		var atok = this.generateAccessToken(user_id, client_id, extra_data, token_options);
+OAuth2Provider.prototype._createAccessToken = function(user, client_id, cb) {
+	this.emit('create_access_token', user, client_id, _.bind(function(extra_data, token_options) {
+		var atok = this.generateAccessToken(user._id, client_id, extra_data, token_options);
 
 		if(this.listeners('save_access_token').length > 0){
 			this.emit('save_access_token', user_id, client_id, atok);
