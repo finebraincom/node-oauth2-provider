@@ -262,14 +262,14 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				return res.end(e.message);
 			}		
 		}		
-		this.emit('refresh_token_auth', client_id, client_secret, refresh_token, _.bind(function(err, user_id) {
+		this.emit('refresh_token_auth', client_id, client_secret, refresh_token, _.bind(function(err, user) {
 			if(err) {
 				res.writeHead(401);
 				return res.end(err.message);
 			}
 
 			if(user._id.toString() != rt_user_id){
-				console.log(user_id);
+//				console.log(user_id);
 				console.warn('refresh token user id does not match');
 				res.writeHead(400);	
 				return res.end('invalid refresh token');
