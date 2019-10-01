@@ -224,7 +224,7 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 
 			res.writeHead(200, CONTENT_TYPE_JSON);
 
-			var ao_redirect_uri = req.query.redirect_uri;
+			var ao_redirect_uri = req.body.redirect_uri;
 			
 
 			this._createAccessToken(user_id, client_id, ao_redirect_uri, function(atok){
@@ -287,7 +287,7 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				}
 				res.writeHead(200, CONTENT_TYPE_JSON);
 
-			var ao_redirect_uri = req.query.redirect_uri;
+				var ao_redirect_uri = req.body.redirect_uri;
 
 				this._createAccessToken(user, client_id, ao_redirect_uri, function(atok){
 						res.end(JSON.stringify(atok));
