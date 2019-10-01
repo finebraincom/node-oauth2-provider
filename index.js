@@ -153,7 +153,9 @@ OAuth2Provider.prototype._processAuthrizeUriPost = function (req, res){
 				return res.end(e.message);
 			}
 
-			this.emit('create_access_token', user_id, client_id, _.bind(function(extra_data,token_options) {
+			var ao_redirect_uri = req.query.redirect_uri;
+
+			this.emit('create_access_token', user_id, client_id, ao_redirect_uri, _.bind(function(extra_data,token_options) {
 				var atok = this.generateAccessToken(user_id, client_id, extra_data, token_options);
 
 				if(this.listeners('save_access_token').length > 0){
@@ -222,7 +224,10 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 
 			res.writeHead(200, CONTENT_TYPE_JSON);
 
-			this._createAccessToken(user_id, client_id, function(atok){
+			var ao_redirect_uri = req.query.redirect_uri;
+			
+
+			this._createAccessToken(user_id, client_id, ao_redirect_uri, function(atok){
 				res.end(JSON.stringify(atok));
 			});
 		}, this));
@@ -282,8 +287,10 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				}
 				res.writeHead(200, CONTENT_TYPE_JSON);
 
-				this._createAccessToken(user, client_id, function(atok){
-					res.end(JSON.stringify(atok));
+			var ao_redirect_uri = req.query.redirect_uri;
+
+				this._createAccessToken(user, client_id, ao_redirect_uri, function(atok){
+						res.end(JSON.stringify(atok));
 				});
 			}, this));
 		}, this));
@@ -296,7 +303,9 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 
 			res.writeHead(200, CONTENT_TYPE_JSON);
 
-			this._createAccessToken(user_id, client_id, _.bind(function(atok) {
+			var ao_redirect_uri = req.query.redirect_uri;
+
+			this._createAccessToken(user_id, client_id, ao_redirect_uri, _.bind(function(atok) {
 				this.emit('remove_grant', user_id, client_id, code);
 
 				res.end(JSON.stringify(atok));
@@ -356,8 +365,8 @@ OAuth2Provider.prototype.oauth = function() {
 	}, this);
 };
 
-OAuth2Provider.prototype._createAccessToken = function(user, client_id, cb) {
-	this.emit('create_access_token', user, client_id, _.bind(function(extra_data, token_options) {
+OAuth2Provider.prototype._createAccessToken = function(user, client_id, ao_redirect_uri, cb) {
+	this.emit('create_access_token', user, client_id, ao_redirect_uri, _.bind(function(extra_data, token_options) {
 		var atok = this.generateAccessToken(user._id, client_id, extra_data, token_options);
 
 		if(this.listeners('save_access_token').length > 0){
