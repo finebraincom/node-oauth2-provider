@@ -239,7 +239,10 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 			return res.end('refresh_token not supported');
 		}
 		var rt_user_id;
+
 		var refresh_token = req.body.refresh_token;
+		var isInMigration = req.body.isInMigration || false;
+
 		try {
 			var data = this.serializer.parse(refresh_token),
 				rt_user_id = data[0],
@@ -269,7 +272,7 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				return res.end(e.message);
 			}		
 		}		
-		this.emit('refresh_token_auth', client_id, client_secret, refresh_token, _.bind(function(err, user) {
+		this.emit('refresh_token_auth', client_id, client_secret, refresh_token ,isInMigration, _.bind(function(err, user) {
 			if(err) {
 				res.writeHead(401);
 				return res.end(err.message);
