@@ -241,7 +241,6 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 		var rt_user_id;
 
 		var refresh_token = req.body.refresh_token;
-		var isInMigration = req.body.isInMigration || false;
 
 		try {
 			var data = this.serializer.parse(refresh_token),
@@ -272,7 +271,7 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				return res.end(e.message);
 			}		
 		}		
-		this.emit('refresh_token_auth', client_id, client_secret, refresh_token, isInMigration, _.bind(function(err, user) {
+		this.emit('refresh_token_auth', client_id, client_secret, refresh_token, _.bind(function(err, user) {
 			if(err) {
 				res.writeHead(401);
 				return res.end(err.message);
