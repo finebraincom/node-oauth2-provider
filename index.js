@@ -60,10 +60,15 @@ util.inherits(OAuth2Provider, EventEmitter);
 
 OAuth2Provider.prototype.generateAccessToken = function(user_id, client_id, extra_data, token_options) {
 	token_options = token_options || {}
+	console.log(token_options);
+	console.log(user_id);
+	console.log(client_id);
+	console.log(extra_data);
 	var out = _.extend(token_options, {
 		access_token: this.serializer.stringify([user_id, client_id, +new Date, extra_data]),
 		refresh_token: this.serializer.stringify([user_id, client_id, +new Date, REFRESH_TOKEN_EXTRA]),
 	});
+	console.log(out);
 	return out;
 };
 
