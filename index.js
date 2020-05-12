@@ -299,7 +299,7 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				var ao_redirect_uri = req.body.redirect_uri;
 				console.log('request for jwt with redirect_uri ' + ao_redirect_uri);
 
-				this._createAccessToken(user, client_id, ao_redirect_uri, force_ao_duplicate, function(atok){
+				this._createAccessToken(user, client_id, ao_redirect_uri, false, function(atok){
 						res.end(JSON.stringify(atok));
 				});
 			}, this));
@@ -316,7 +316,7 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 			var ao_redirect_uri = req.query.redirect_uri;
 			console.log('request for jwt with redirect_uri ' + ao_redirect_uri);
 
-			this._createAccessToken(user_id, client_id, ao_redirect_uri, force_ao_duplicate, _.bind(function(atok) {
+			this._createAccessToken(user_id, client_id, ao_redirect_uri, false, _.bind(function(atok) {
 				this.emit('remove_grant', user_id, client_id, code);
 
 				res.end(JSON.stringify(atok));
