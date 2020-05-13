@@ -234,7 +234,7 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 			console.log('request for jwt with redirect_uri ' + ao_redirect_uri);
 			
 
-			this._createAccessToken(user_id, client_id, ao_redirect_uri, force_ao_duplicate, function(atok){
+			this._createAccessToken(user_id, client_id, ao_redirect_uri, false, function(atok){
 				res.end(JSON.stringify(atok));
 			});
 		}, this));
