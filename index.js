@@ -276,7 +276,7 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 				return res.end(e.message);
 			}		
 		}		
-		this.emit('refresh_token_auth', client_id, client_secret, refresh_token, _.bind(function(err, user) {
+		this.emit('refresh_token_auth', client_id, client_secret, refresh_token, req, _.bind(function(err, user) {
 			if(err) {
 				res.writeHead(401);
 				return res.end(err.message);
