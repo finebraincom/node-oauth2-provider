@@ -224,8 +224,13 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 
 		this.emit('client_auth', client_id, client_secret, req.body.username, req.body.password, _.bind(function(err, user_id) {
 			if(err) {
-				res.writeHead(401);
-				return res.end(err.message);
+				if (typeof err == 'number') {
+					res.writeHead(err);
+					return res.end();
+				} else {
+					res.writeHead(401);
+					return res.end(err.message);					
+				}
 			}
 
 			res.writeHead(200, CONTENT_TYPE_JSON);
@@ -278,8 +283,13 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 		}		
 		this.emit('refresh_token_auth', client_id, client_secret, refresh_token, req, _.bind(function(err, user) {
 			if(err) {
-				res.writeHead(401);
-				return res.end(err.message);
+				if (typeof err == 'number') {
+					res.writeHead(err);
+					return res.end();
+				} else {
+					res.writeHead(401);
+					return res.end(err.message);					
+				}
 			}
 
 			if(user._id.toString() != rt_user_id){
@@ -306,9 +316,12 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 		}, this));
 	}else{
 		this.emit('lookup_grant', client_id, client_secret, code, _.bind(function(err, user_id){
-			if(err){
+			if (typeof err == 'number') {
+				res.writeHead(err);
+				return res.end();
+			} else if(err){
 				res.writeHead(400);
-				return res.end(err.message);
+				return res.end(err.message);					
 			}
 
 			res.writeHead(200, CONTENT_TYPE_JSON);
