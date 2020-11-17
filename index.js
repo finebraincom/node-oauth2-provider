@@ -330,7 +330,7 @@ OAuth2Provider.prototype._processAccessTokenUriPost = function (req, res){
 			res.writeHead(200, CONTENT_TYPE_JSON);
 
 			var ao_redirect_uri = req.query.redirect_uri;
-			bar ao_state = req.query.state;
+			var ao_state = req.query.state;
 			console.log('request for jwt with redirect_uri ' + ao_redirect_uri);
 
 			this._createAccessToken(user_id, client_id, ao_redirect_uri, ao_state, false, _.bind(function(atok) {
