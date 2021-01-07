@@ -64,7 +64,6 @@ OAuth2Provider.prototype.generateAccessToken = function(user_id, client_id, extr
 		access_token: this.serializer.stringify([user_id, client_id, +new Date, extra_data]),
 		refresh_token: this.serializer.stringify([user_id, client_id, +new Date, REFRESH_TOKEN_EXTRA]),
 	});
-	console.log(out);
 	return out;
 };
 
